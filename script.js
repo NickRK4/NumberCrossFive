@@ -1,6 +1,6 @@
 const grid = document.getElementById('grid');
 const resetBtn = document.getElementById('resetBtn');
-
+const calculateBtn = document.getElementById('calculateBtn');
 
 // Build 7x7 grid
 const mirrors = Array(7).fill(0).map(() => Array(7).fill(0));
@@ -13,9 +13,11 @@ for (let row = 0; row < 7; row++) {
     // If on border, make it a non-editable zero
     if (row === 0 || row === 6 || col === 0 || col === 6) {
         const input = document.createElement('div');
-        input.className = 'value';
         if (!((row === 0 && col === 0) || (row === 0 && col === 6) || (row === 6 && col === 0) || (row === 6 && col === 6))){ 
+            input.className = 'value';
             input.appendChild(document.createTextNode("0"))
+        } else {
+            input.className = 'solid';
         }
         cell.appendChild(input);
     } else {
@@ -39,16 +41,16 @@ function handleInnerClick(cell) {
     cell.classList.add('diag-up');
     }
     updateGrid();
-    console.log(mirrors);
 }
 
-
 resetBtn.addEventListener('click', () => {
-    updateGrid();
+    const existingResult = document.getElementById('result');
+    if (existingResult) {
+        document.body.removeChild(existingResult);
+    }
     document.querySelectorAll('.cell').forEach(cell => {
         const row = parseInt(cell.dataset.row);
         const col = parseInt(cell.dataset.col);
-
         if ((row === 0 || row === 6 || col === 0 || col === 6) && !((row === 0 && col === 0) || (row === 0 && col === 6) || (row === 6 && col === 0) || (row === 6 && col === 6))) {
             let valueDiv = cell.querySelector('.value');
             if (!valueDiv) {
@@ -64,6 +66,34 @@ resetBtn.addEventListener('click', () => {
             mirrors[row][col] = 0;
         }
     });
+    updateGrid();
+});
+
+calculateBtn.addEventListener('click', () => {
+    // Check if result already exists
+    const existingResult = document.getElementById('result');
+    if (existingResult) {
+        document.body.removeChild(existingResult);
+    }
+    
+    let total = 0;
+    // sum across the top and bottom
+    for (row = 0; row < 7; row+=6){
+        for (col = 0; col < 7; col++){
+            total += mirrors[row][col];
+        }
+    }
+    // sum across the left and right
+    for (row = 1; row < 6; row++){
+        for (col = 0; col < 7; col+=6){
+            total += mirrors[row][col];
+        }
+    }
+    const result = document.createElement('span');
+    result.id = 'result';
+    result.textContent = `Total: ${total}`;
+    result.style.display = "inline-block";
+    document.body.insertBefore(result, calculateBtn.nextElementSibling);
 });
 
 const getDistance = function(maze, row, col, rowDir, colDir, total, list) {
@@ -160,7 +190,6 @@ function resetGrid() {
     }
 }
 
-
 function updateCellValue(cell, value) {
     if (!cell) return;
     let valueDiv = cell.querySelector('.value');
@@ -171,3 +200,4 @@ function updateCellValue(cell, value) {
     }
     valueDiv.textContent = value;
 }
+updateGrid();
