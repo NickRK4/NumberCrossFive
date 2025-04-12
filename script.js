@@ -3,17 +3,17 @@ const resetBtn = document.getElementById('resetBtn');
 const calculateBtn = document.getElementById('calculateBtn');
 
 // Build 7x7 grid
-const mirrors = Array(7).fill(0).map(() => Array(7).fill(0));
-for (let row = 0; row < 7; row++) {
-    for (let col = 0; col < 7; col++) {
+const mirrors = Array(12).fill(0).map(() => Array(12).fill(0));
+for (let row = 0; row < 12; row++) {
+    for (let col = 0; col < 12; col++) {
     const cell = document.createElement('div');
     cell.classList.add('cell');
     cell.dataset.row = row;
     cell.dataset.col = col;
     // If on border, make it a non-editable zero
-    if (row === 0 || row === 6 || col === 0 || col === 6) {
+    if (row === 0 || row === 11 || col === 0 || col === 11) {
         const input = document.createElement('div');
-        if (!((row === 0 && col === 0) || (row === 0 && col === 6) || (row === 6 && col === 0) || (row === 6 && col === 6))){ 
+        if (!((row === 0 && col === 0) || (row === 0 && col === 11) || (row === 11 && col === 0) || (row === 11 && col === 11))){ 
             input.className = 'value';
             input.appendChild(document.createTextNode("0"))
         } else {
@@ -51,7 +51,7 @@ resetBtn.addEventListener('click', () => {
     document.querySelectorAll('.cell').forEach(cell => {
         const row = parseInt(cell.dataset.row);
         const col = parseInt(cell.dataset.col);
-        if ((row === 0 || row === 6 || col === 0 || col === 6) && !((row === 0 && col === 0) || (row === 0 && col === 6) || (row === 6 && col === 0) || (row === 6 && col === 6))) {
+        if ((row === 0 || row === 11 || col === 0 || col === 11) && !((row === 0 && col === 0) || (row === 0 && col === 11) || (row === 11 && col === 0) || (row === 11 && col === 11))) {
             let valueDiv = cell.querySelector('.value');
             if (!valueDiv) {
                 valueDiv = document.createElement('div');
@@ -75,18 +75,18 @@ calculateBtn.addEventListener('click', () => {
     if (existingResult) {
         document.body.removeChild(existingResult);
     }
-    
-    let total = 0;
+
+    let total = BigInt(1);
     // sum across the top and bottom
-    for (row = 0; row < 7; row+=6){
-        for (col = 0; col < 7; col++){
-            total += mirrors[row][col];
+    for (let row = 0; row < 12; row+=11){
+        for (let col = 1; col < 11; col++){
+            total *= BigInt(mirrors[row][col]);
         }
     }
     // sum across the left and right
-    for (row = 1; row < 6; row++){
-        for (col = 0; col < 7; col+=6){
-            total += mirrors[row][col];
+    for (let row = 1; row < 11; row++){
+        for (let col = 0; col < 12; col+=11){
+            total *= BigInt(mirrors[row][col]);
         }
     }
     const result = document.createElement('span');
@@ -98,7 +98,7 @@ calculateBtn.addEventListener('click', () => {
 
 const getDistance = function(maze, row, col, rowDir, colDir, total, list) {
     // if not at the start row and col
-    if ((total !== 0) && (row === 0 || col === 0 || row >= 6 || col >= 6)){
+    if ((total !== 0) && (row === 0 || col === 0 || row >= 11 || col >= 11)){
         list.push(row);
         list.push(col);
         return total // base case, reach the end
@@ -129,8 +129,8 @@ const updateGrid = () => {
     resetGrid();
     let visitedCells = [];
     // update the left and right cols
-    for (let col = 0; col < 7; col+=6){
-        for (let row = 1; row < 6; row++){
+    for (let col = 0; col < 12; col+=11){
+        for (let row = 1; row < 11; row++){
             if (visitedCells.includes(`${row},${col}`)) continue;
             let dist = 0;
             let endCords = [];
@@ -154,8 +154,8 @@ const updateGrid = () => {
     }
 
     // update the top and bottom rows
-    for (let row = 0; row < 7; row+=6){
-        for (let col = 1; col < 6; col++){
+    for (let row = 0; row < 12; row+=11){
+        for (let col = 1; col < 11; col++){
             if (visitedCells.includes(`${row},${col}`)) continue;
             let dist = 0;
             let endCords = [];
@@ -179,9 +179,9 @@ const updateGrid = () => {
 }
 
 function resetGrid() {
-    for (let row = 0; row < 7; row++) {
-        for (let col = 0; col < 7; col++) {
-            if ((row === 0 || row === 6 || col === 0 || col === 6) && !((row === 0 && col === 0) || (row === 0 && col === 6) || (row === 6 && col === 0) || (row === 6 && col === 6))) {
+    for (let row = 0; row < 12; row++) {
+        for (let col = 0; col < 12; col++) {
+            if ((row === 0 || row === 11 || col === 0 || col === 11) && !((row === 0 && col === 0) || (row === 0 && col === 11) || (row === 11 && col === 0) || (row === 11 && col === 11))) {
                 mirrors[row][col] = 0;
                 const cell = document.querySelector(`.cell[data-row="${row}"][data-col="${col}"]`);
                 updateCellValue(cell, 0);
