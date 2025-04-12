@@ -94,9 +94,13 @@ const getDistance = function(maze, row, col, rowDir, colDir, total, list) {
 }
 
 const updateGrid = () => {
+    // first reset grid
+    resetGrid();
+    let visitedCells = [];
     // update the left and right cols
-    for (let col = 0; col < mirrors.length; col+=6){
+    for (let col = 0; col < 7; col+=6){
         for (let row = 1; row < 6; row++){
+            if (visitedCells.includes(`${row},${col}`)) continue;
             let dist = 0;
             let endCords = [];
             if (col === 0){
@@ -104,14 +108,47 @@ const updateGrid = () => {
             } else{
                 dist = getDistance(mirrors, row, col, 0, -1, 0, endCords);
             }
+            // add to visited cells
+            visitedCells.push(`${row},${col}`);
+            visitedCells.push(`${endCords[0]},${endCords[1]}`);
 
-            // update the mirrors and the grid
+             // update the mirrors and the grid
             mirrors[row][col] = dist;
             mirrors[endCords[0]][endCords[1]] = dist;
             const startCell = document.querySelector(`.cell[data-row="${row}"][data-col="${col}"]`);
             updateCellValue(startCell, dist);
             const endCell = document.querySelector(`.cell[data-row="${endCords[0]}"][data-col="${endCords[1]}"]`);
             updateCellValue(endCell, dist);
+        }
+    }
+}
+
+function reflectedDirection(rowDir, colDir, mirror){
+    if (mirrorType === 1) {
+        // "/" mirror
+        if (rowDir === 0 && colDir === 1) return [-1, 0]; // → → ↑
+        if (rowDir === 0 && colDir === -1) return [1, 0]; // ← → ↓
+        if (rowDir === 1 && colDir === 0) return [0, -1]; // ↓ → ←
+        if (rowDir === -1 && colDir === 0) return [0, 1]; // ↑ → →
+    } else if (mirrorType === 2) {
+        // "\" mirror
+        if (rowDir === 0 && colDir === 1) return [1, 0];  // → → ↓
+        if (rowDir === 0 && colDir === -1) return [-1, 0];// ← → ↑
+        if (rowDir === 1 && colDir === 0) return [0, 1];  // ↓ → →
+        if (rowDir === -1 && colDir === 0) return [0, -1];// ↑ → ←
+    }
+    return [rowDir, colDir]; // no mirror or invalid state, go straight
+}
+
+
+function resetGrid() {
+    for (let row = 0; row < 7; row++) {
+        for (let col = 0; col < 7; col++) {
+            if (row === 0 || row === 6 || col === 0 || col === 6) {
+                mirrors[row][col] = 0;
+                const cell = document.querySelector(`.cell[data-row="${row}"][data-col="${col}"]`);
+                updateCellValue(cell, 0);
+            }
         }
     }
 }
