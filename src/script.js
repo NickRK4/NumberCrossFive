@@ -1,6 +1,7 @@
 const grid = document.getElementById('grid');
 const resetBtn = document.getElementById('resetBtn');
 
+
 // Build 7x7 grid
 const mirrors = Array(7).fill(0).map(() => Array(7).fill(0));
 for (let row = 0; row < 7; row++) {
@@ -9,12 +10,13 @@ for (let row = 0; row < 7; row++) {
     cell.classList.add('cell');
     cell.dataset.row = row;
     cell.dataset.col = col;
-
     // If on border, make it a non-editable zero
     if (row === 0 || row === 6 || col === 0 || col === 6) {
         const input = document.createElement('div');
         input.className = 'value';
-        input.appendChild(document.createTextNode("0"))
+        if (!((row === 0 && col === 0) || (row === 0 && col === 6) || (row === 6 && col === 0) || (row === 6 && col === 6))){ 
+            input.appendChild(document.createTextNode("0"))
+        }
         cell.appendChild(input);
     } else {
         // Inner clickable cell logic
@@ -42,11 +44,12 @@ function handleInnerClick(cell) {
 
 
 resetBtn.addEventListener('click', () => {
+    updateGrid();
     document.querySelectorAll('.cell').forEach(cell => {
         const row = parseInt(cell.dataset.row);
         const col = parseInt(cell.dataset.col);
 
-        if (row === 0 || row === 6 || col === 0 || col === 6) {
+        if ((row === 0 || row === 6 || col === 0 || col === 6) && !((row === 0 && col === 0) || (row === 0 && col === 6) || (row === 6 && col === 0) || (row === 6 && col === 6))) {
             let valueDiv = cell.querySelector('.value');
             if (!valueDiv) {
                 valueDiv = document.createElement('div');
@@ -63,10 +66,8 @@ resetBtn.addEventListener('click', () => {
     });
 });
 
-
 const getDistance = function(maze, row, col, rowDir, colDir, total, list) {
     // if not at the start row and col
-    console.log(`You are at row ${row} and col ${col}. Total = ${total}`);
     if ((total !== 0) && (row === 0 || col === 0 || row >= 6 || col >= 6)){
         list.push(row);
         list.push(col);
@@ -121,30 +122,36 @@ const updateGrid = () => {
             updateCellValue(endCell, dist);
         }
     }
-}
 
-function reflectedDirection(rowDir, colDir, mirror){
-    if (mirrorType === 1) {
-        // "/" mirror
-        if (rowDir === 0 && colDir === 1) return [-1, 0]; // → → ↑
-        if (rowDir === 0 && colDir === -1) return [1, 0]; // ← → ↓
-        if (rowDir === 1 && colDir === 0) return [0, -1]; // ↓ → ←
-        if (rowDir === -1 && colDir === 0) return [0, 1]; // ↑ → →
-    } else if (mirrorType === 2) {
-        // "\" mirror
-        if (rowDir === 0 && colDir === 1) return [1, 0];  // → → ↓
-        if (rowDir === 0 && colDir === -1) return [-1, 0];// ← → ↑
-        if (rowDir === 1 && colDir === 0) return [0, 1];  // ↓ → →
-        if (rowDir === -1 && colDir === 0) return [0, -1];// ↑ → ←
+    // update the top and bottom rows
+    for (let row = 0; row < 7; row+=6){
+        for (let col = 1; col < 6; col++){
+            if (visitedCells.includes(`${row},${col}`)) continue;
+            let dist = 0;
+            let endCords = [];
+            if (row === 0){
+                dist = getDistance(mirrors, row, col, 1, 0, 0, endCords);
+            } else{
+                dist = getDistance(mirrors, row, col, -1, 0, 0, endCords);
+            }
+            // add to visited cells
+            visitedCells.push(`${row},${col}`);
+            visitedCells.push(`${endCords[0]},${endCords[1]}`);
+            mirrors[row][col] = dist;
+            mirrors[endCords[0]][endCords[1]] = dist;
+            const startCell = document.querySelector(`.cell[data-row="${row}"][data-col="${col}"]`);
+            updateCellValue(startCell, dist);
+            const endCell = document.querySelector(`.cell[data-row="${endCords[0]}"][data-col="${endCords[1]}"]`);
+            updateCellValue(endCell, dist);
+        }
     }
-    return [rowDir, colDir]; // no mirror or invalid state, go straight
-}
 
+}
 
 function resetGrid() {
     for (let row = 0; row < 7; row++) {
         for (let col = 0; col < 7; col++) {
-            if (row === 0 || row === 6 || col === 0 || col === 6) {
+            if ((row === 0 || row === 6 || col === 0 || col === 6) && !((row === 0 && col === 0) || (row === 0 && col === 6) || (row === 6 && col === 0) || (row === 6 && col === 6))) {
                 mirrors[row][col] = 0;
                 const cell = document.querySelector(`.cell[data-row="${row}"][data-col="${col}"]`);
                 updateCellValue(cell, 0);
@@ -152,6 +159,7 @@ function resetGrid() {
         }
     }
 }
+
 
 function updateCellValue(cell, value) {
     if (!cell) return;
