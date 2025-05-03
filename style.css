@@ -7,7 +7,7 @@ body {
 .grid {
   display: grid;
   grid-template-columns: repeat(12, 60px);
-  grid-template-rows: repeat(12, 60px);
+  grid-template-rows: repeat(11, 60px);
   gap: 5px;
   justify-content: center;
   margin-bottom: 20px;
@@ -65,7 +65,7 @@ div.value {
   cursor: not-allowed;
 }
 
-div.solid {
+div.uneditable {
   display: flex;
   cursor: not-allowed;
   justify-content: center;
@@ -74,10 +74,14 @@ div.solid {
   height: 100%;
   font-size: 16px;
   border: none;
-  background: repeating-linear-gradient(45deg, #f0f0f0, #f0f0f0 7px, #e9e9e9 7px, #e9e9e9 14px);
+  background: repeating-linear-gradient(45deg, #cccccc, #e4e4e4 7px, #e9e9e9 7px, #e9e9e9 14px);
 }
 
 button {
   padding: 10px 15px;
   font-size: 16px;
+}
+
+.cell.one{
+  background-color: aquamarine;
 }
