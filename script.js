@@ -22,7 +22,7 @@ console.log(groups[0].length)
 const mirrors = Array(11).fill(0).map(() => Array(11).fill(0));
 
 for (let row = 0; row < 11; row++) {
-    for (let col = 0; col < 12; col++) {
+    for (let col = 0; col < 13; col++) {
     const cell = document.createElement('div');
     cell.classList.add('cell');
     cell.dataset.row = row;
@@ -31,9 +31,15 @@ for (let row = 0; row < 11; row++) {
     if (col === 0) {
         cell.classList.add('uneditable');
         cell.innerHTML = 0;
+    } else if (col === 1){
+        let message = document.createElement('p');
+        message.textContent = '1';
+        cell.appendChild(message);
+        cell.classList.add('uneditable');
+        cell.innerHTML = 1;
     } else {
         // Inner clickable cell logic
-        switch (groups[row][col - 1]) {
+        switch (groups[row][col - 2]) {
             case 0:
                 cell.classList.add('one');
                 break;
@@ -58,6 +64,8 @@ for (let row = 0; row < 11; row++) {
             case 7:
                 cell.classList.add('eight');
                 break;
+            case 8:
+            cell.classList.add('nine');
         }
 
 

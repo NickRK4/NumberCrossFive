@@ -6,7 +6,7 @@ body {
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(12, 60px);
+  grid-template-columns: repeat(13, 60px);
   grid-template-rows: repeat(11, 60px);
   gap: 5px;
   justify-content: center;
@@ -83,5 +83,37 @@ button {
 }
 
 .cell.one{
-  background-color: aquamarine;
+  background-color: #f39292
+}
+
+.cell.two{
+  background-color: #FCD59B
+}
+
+.cell.three{
+  background-color: #F8A993
+}
+
+.cell.four{
+  background-color: #d8e7d7;
+}
+
+.cell.five{
+  background-color: #9CC9AA;
+}
+
+.cell.six{
+  background-color: #afd8e0
+}
+
+.cell.seven{
+  background-color: #adb2c3;
+}
+
+.cell.eight{
+  background-color: #776b7e;
+}
+
+.cell.nine{
+  background-color: rgb(242, 168, 221);
 }
