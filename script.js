@@ -2,6 +2,29 @@ const grid = document.getElementById('grid');
 const resetBtn = document.getElementById('resetBtn');
 const calculateBtn = document.getElementById('calculateBtn');
 
+const labelTexts = [
+        'square',
+        'product of digits is 20',
+        'multiple of 13',
+        'multiple of 32',
+        'divisible by each of its digits',
+        'product of digits is 25',
+        'divisible by each of its digits',
+        'odd palindrome',
+        'fibonacci',
+        'product of digits is 2025',
+        'prime'
+    ];
+
+const rowLabelsContainer = document.querySelector('.row-labels');
+labelTexts.forEach(text => {
+    const label = document.createElement('div');
+    label.classList.add('row-label');
+    label.textContent = text;
+    rowLabelsContainer.appendChild(label);
+});
+
+
 const groups=[
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -16,30 +39,35 @@ const groups=[
     [5, 5, 8, 8, 8, 8, 8, 8, 5, 5, 5]
   ];
 
-console.log(groups[0].length)
+  exclusionRows = [1,1,2,2,3,3,5,6,6,6,6,7,8,8,9]
+  exclusionCols = [3,4,4,9,8,9,5,1,2,5,6,1,4,5,4]
 
 // Build out the grid grid
 const mirrors = Array(11).fill(0).map(() => Array(11).fill(0));
 
 for (let row = 0; row < 11; row++) {
-    for (let col = 0; col < 13; col++) {
+    for (let col = 0; col < 12; col++) {
     const cell = document.createElement('div');
     cell.classList.add('cell');
     cell.dataset.row = row;
     cell.dataset.col = col;
+    
+    for (let i = 0; i < exclusionRows.length; i++) {
+        if (row === exclusionRows[i] && col === exclusionCols[i]) {
+            cell.classList.add('solid');
+            console.log(cell);
+        }
+    }
+
+
+
     // make col 0 uneditable
-    if (col === 0) {
+    if (col === 0){
         cell.classList.add('uneditable');
         cell.innerHTML = 0;
-    } else if (col === 1){
-        let message = document.createElement('p');
-        message.textContent = '1';
-        cell.appendChild(message);
-        cell.classList.add('uneditable');
-        cell.innerHTML = 1;
     } else {
         // Inner clickable cell logic
-        switch (groups[row][col - 2]) {
+        switch (groups[row][col - 1]) {
             case 0:
                 cell.classList.add('one');
                 break;
@@ -75,12 +103,71 @@ for (let row = 0; row < 11; row++) {
     }
 }
 
+// gets all the cells that are in the exlusion rows and cols
+
+
+const buttonsRow = document.querySelector('.buttons-row');
+
+const groupsList = ["one", "two", "three", "four", "five", "six", "seven", "eight", "nine"]
+const colors = ["#F39292", "#FCD59B","#F8A993","#D8E6D7","#9CC9AA","#AFD8E0","#ADB2C2","#776B7E", "#F2A8DD"];
+
+
+groupsList.forEach(i => {
+    const button = document.createElement('button');
+    button.textContent = i;
+    button.style.backgroundColor = colors[groupsList.indexOf(i)];
+    button.classList = "button-top";
+    button.style.borderColor = "black";
+    buttonsRow.appendChild(button);
+
+})
+
+// select all buttons from the buttons row
+const buttons = document.querySelectorAll('.buttons-row button');
+
+console.log(buttons.length);
+buttons.forEach(button => {
+    button.addEventListener('click', (event) => {
+        const group = button.textContent;
+        // Get all the cells with the same group 
+        const cells = document.querySelectorAll(`.cell.${group}`);
+        console.log(cells.length);
+        cells.forEach(cell => {
+            if (!cell.textContent) {
+                cell.textContent = 1;
+            } else{
+                if (event.shiftKey) {
+                    cell.textContent = (parseInt(cell.textContent) - 1) % 10;
+                    if (cell.textContent === '0') {
+                        cell.textContent = 9;
+                    }
+                } else{
+                    cell.textContent = (parseInt(cell.textContent) + 1) % 10;
+                    if (cell.textContent === '0') {
+                        cell.textContent = 1;
+                    }
+                }
+               
+            }
+        });
+    });
+});
+
+
+
+
+
+
+
 function handleInnerClick(cell) {
     
 }
 
 resetBtn.addEventListener('click', () => {
-    // do later
+    const allCells = document.querySelectorAll('.cell');
+    allCells.forEach(cell => {
+        cell.textContent = "";
+    });
 });
 
 calculateBtn.addEventListener('click', () => {
