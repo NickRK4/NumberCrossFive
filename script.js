@@ -1,6 +1,8 @@
 const grid = document.getElementById('grid');
 const resetBtn = document.getElementById('resetBtn');
 const calculateBtn = document.getElementById('calculateBtn');
+const saveBtn = document.getElementById('saveBtn');
+let nullify = false;
 
 const labelTexts = [
         'square',
@@ -39,8 +41,9 @@ const groups=[
     [5, 5, 8, 8, 8, 8, 8, 8, 5, 5, 5]
   ];
 
-  exclusionRows = [1,1,2,2,3,3,5,6,6,6,6,7,8,8,9]
-  exclusionCols = [3,4,4,9,8,9,5,1,2,5,6,1,4,5,4]
+// all the groups that cannot be edited
+exclusionRows = [1,1,2,2,3,3,5,6,6,6,6,7,8,8,9];
+exclusionCols = [4,5,5,10,9,10,6,2,3,6,7,2,5,6,5];
 
 // Build out the grid grid
 const mirrors = Array(11).fill(0).map(() => Array(11).fill(0));
@@ -51,15 +54,15 @@ for (let row = 0; row < 11; row++) {
     cell.classList.add('cell');
     cell.dataset.row = row;
     cell.dataset.col = col;
-    
+    cell.addEventListener('click', () => handleInnerClick(event, cell));
+
+    // make the blocked out rows and cols solid
     for (let i = 0; i < exclusionRows.length; i++) {
         if (row === exclusionRows[i] && col === exclusionCols[i]) {
             cell.classList.add('solid');
             console.log(cell);
         }
     }
-
-
 
     // make col 0 uneditable
     if (col === 0){
@@ -95,9 +98,6 @@ for (let row = 0; row < 11; row++) {
             case 8:
             cell.classList.add('nine');
         }
-
-
-        cell.addEventListener('click', () => handleInnerClick(cell));
     }
     grid.appendChild(cell);
     }
@@ -121,6 +121,16 @@ groupsList.forEach(i => {
     buttonsRow.appendChild(button);
 
 })
+// add the special black button
+const blackButton = document.createElement('button');
+blackButton.textContent = "nullify";
+blackButton.style.color = "black";
+blackButton.style.backgroundColor = "white";
+blackButton.classList = "button-top";
+blackButton.style.borderColor = "black";
+buttonsRow.appendChild(blackButton);
+
+
 
 // select all buttons from the buttons row
 const buttons = document.querySelectorAll('.buttons-row button');
@@ -138,41 +148,67 @@ buttons.forEach(button => {
             } else{
                 if (event.shiftKey) {
                     cell.textContent = (parseInt(cell.textContent) - 1) % 10;
-                    if (cell.textContent === '0') {
-                        cell.textContent = 9;
-                    }
                 } else{
                     cell.textContent = (parseInt(cell.textContent) + 1) % 10;
-                    if (cell.textContent === '0') {
-                        cell.textContent = 1;
-                    }
                 }
-               
+                if (cell.textContent === '-1') {
+                    cell.textContent = 9;
+                }
             }
         });
     });
 });
 
-
-
-
-
-
-
-function handleInnerClick(cell) {
-    
+function handleInnerClick(event, cell) {
+    if (nullify){
+        // if it's nulled then remove the nulled class
+        if (cell.classList.contains('nulled')) {
+            cell.classList.remove('nulled');
+        } else{
+            cell.classList.add('nulled');
+        }
+    } else {
+        if (!cell.textContent) {
+            cell.textContent = 1;
+            return;
+        }
+        if (event.shiftKey) {
+            cell.textContent = (parseInt(cell.textContent) - 1) % 10;
+        } else {
+            cell.textContent = (parseInt(cell.textContent) + 1) % 10;
+        }
+        if (cell.textContent === '-1') {
+            cell.textContent = 9;
+        }
+    }
 }
+
+
+
+blackButton.addEventListener('click', () => {
+    nullify = !nullify;
+    blackButton.style.backgroundColor = nullify ? "black" : "white";
+    blackButton.style.color = nullify ? "white" : "black";
+})
+
 
 resetBtn.addEventListener('click', () => {
     const allCells = document.querySelectorAll('.cell');
     allCells.forEach(cell => {
+        if (cell.classList.contains('uneditable')) {
+            cell.innerHTML = 0;
+            return
+        }
         cell.textContent = "";
     });
 });
 
+
 calculateBtn.addEventListener('click', () => {
     // do later
 });
+
+
 
 
 
