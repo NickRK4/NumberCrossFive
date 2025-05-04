@@ -189,7 +189,69 @@ blackButton.addEventListener('click', () => {
     blackButton.style.color = nullify ? "white" : "black";
 })
 
+calculateBtn.addEventListener('click', () => {     
+    // clear existing result if there is any
+    if (document.getElementById('result')) {
+        document.getElementById('result').remove();
+    }
+
+    // check quickly if all the cells are filled
+    const allCells = document.querySelectorAll('.cell');
+    for (let i = 0; i < allCells.length; i++) {
+        const cell = allCells[i];
+        if (!cell.classList.contains('uneditable')) {
+            if (!cell.textContent) {
+                const message = document.createElement('span');
+                message.style.display = 'inline-block';
+                message.id = 'result';
+                message.textContent = 'Please fill in all the cells';
+                document.body.insertBefore(message, calculateBtn.nextElementSibling);
+                return;
+            }
+        }
+    }
+
+    // otherwise calculate the sum of concatenated numbers in each row
+    let gridTotal = 0;
+    for (let row = 0; row < 11; row++) {
+        const rowCells = document.querySelectorAll(`.cell[data-row="${row}"]`);
+        let rowTotal = 0;
+        // register for the current number you will add
+        let number = "";
+        rowCells.forEach(cell => {
+            if (!cell.classList.contains('uneditable') && cell.textContent) {
+                // if you reach a wall
+                if (cell.classList.contains('nulled')) {
+                    // if there is a valid number to add
+                    if (number) {
+                        rowTotal += parseInt(number);
+                    }
+                    number = "";
+                } else {
+                    // else, keep concatenating the number
+                    number += cell.textContent;
+                }
+                // if at the end of the column you need to add if there's a number
+                if (cell.dataset.col === '11' && number) {
+                    rowTotal += parseInt(number);
+                    number = "";
+                }
+            }
+        })
+        gridTotal += rowTotal;
+    }
+    // show the result next to the calculation button
+    const res = document.createElement('span');
+    res.id = 'result';
+    res.textContent = `Total: ${gridTotal}`;
+    res.style.display = 'inline-block';
+    document.body.insertBefore(res, calculateBtn.nextElementSibling);
+});
+
 resetBtn.addEventListener('click', () => {
+    if (document.getElementById('result')) {
+        document.getElementById('result').remove();
+    }
     const allCells = document.querySelectorAll('.cell');
     allCells.forEach(cell => {
         if (cell.classList.contains('uneditable')) {
