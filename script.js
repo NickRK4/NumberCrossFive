@@ -60,7 +60,6 @@ for (let row = 0; row < 11; row++) {
     for (let i = 0; i < exclusionRows.length; i++) {
         if (row === exclusionRows[i] && col === exclusionCols[i]) {
             cell.classList.add('solid');
-            console.log(cell);
         }
     }
 
@@ -134,14 +133,11 @@ buttonsRow.appendChild(blackButton);
 
 // select all buttons from the buttons row
 const buttons = document.querySelectorAll('.buttons-row button');
-
-console.log(buttons.length);
 buttons.forEach(button => {
     button.addEventListener('click', (event) => {
         const group = button.textContent;
         // Get all the cells with the same group 
         const cells = document.querySelectorAll(`.cell.${group}`);
-        console.log(cells.length);
         cells.forEach(cell => {
             if (!cell.textContent) {
                 cell.textContent = 1;
@@ -156,6 +152,8 @@ buttons.forEach(button => {
                 }
             }
         });
+        // update the rows again
+        calculateAllRows();
     });
 });
 
@@ -181,6 +179,8 @@ function handleInnerClick(event, cell) {
             cell.textContent = 9;
         }
     }
+    // update the rows again
+    calculateRow(cell.dataset.row);
 }
 
 
@@ -203,12 +203,29 @@ resetBtn.addEventListener('click', () => {
     });
 });
 
+function calculateRow(row) {
+    const rowCells = document.querySelectorAll(`.cell[data-row="${row}"]`);
+    let total = 0;
+    rowCells.forEach(cell => {
+        if (!cell.classList.contains('uneditable') && cell.textContent) {
+            total += parseInt(cell.textContent);
+        }
+    })
+    rowCells[0].textContent = total;
+}
 
-calculateBtn.addEventListener('click', () => {
-    // do later
-});
-
-
+function calculateAllRows() {
+    for (let row = 0; row < 11; row++) {
+        const rowCells = document.querySelectorAll(`.cell[data-row="${row}"]`);
+        let total = 0;
+        rowCells.forEach(cell => {
+            if (!cell.classList.contains('uneditable') && cell.textContent) {
+                total += parseInt(cell.textContent);
+            }
+        })
+        rowCells[0].textContent = total;
+    }
+}
 
 
 
