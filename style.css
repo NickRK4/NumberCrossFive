@@ -1,7 +1,10 @@
 body {
   font-family: Arial, sans-serif;
   text-align: center;
-  margin-top: 30px;
+  margin-bottom: 30px;
+  margin-top: -30px;
+  scale: 0.9;
+  overflow: hidden;
 }
 
 .puzzle-container {

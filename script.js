@@ -259,6 +259,9 @@ resetBtn.addEventListener('click', () => {
             return
         }
         cell.textContent = "";
+        if (cell.classList.contains('nulled')) {
+            cell.classList.remove('nulled');
+        }
     });
 });
 
