@@ -183,14 +183,11 @@ function handleInnerClick(event, cell) {
     calculateRow(cell.dataset.row);
 }
 
-
-
 blackButton.addEventListener('click', () => {
     nullify = !nullify;
     blackButton.style.backgroundColor = nullify ? "black" : "white";
     blackButton.style.color = nullify ? "white" : "black";
 })
-
 
 resetBtn.addEventListener('click', () => {
     const allCells = document.querySelectorAll('.cell');
